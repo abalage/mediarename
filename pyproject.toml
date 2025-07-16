@@ -1,0 +1,72 @@
+[build-system]
+requires = ["setuptools>=61.0", "setuptools-scm>=8"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "rename-media-files"
+dynamic = ["version"]
+description = "A package to mass rename media files based on their metadata."
+keywords = ["rename", "image", "video"]
+readme = "README.md"
+authors = [
+    { name = "Balázs NÉMETH", email = "balagetech@protonmail.com" }
+]
+maintainers = [
+  {name = "Balázs NÉMETH", email = "balagetech@protonmail.com"}
+]
+classifiers=[
+    "Development Status :: 4 - Beta",
+    "Programming Language :: Python :: 3",
+    'Operating System :: OS Independent',
+]
+license = {text = "GNU General Public License v3"}
+requires-python = ">= 3.11"
+dependencies = [
+    "pydantic>=2.10.0",
+]
+
+[project.optional-dependencies]
+dev = [
+    "coverage",  # testing
+    "mypy",  # linting
+    "pytest",  # testing
+    "pytest-cov",  # testing
+    "ruff",  # linting
+    "mccabe" # linting
+]
+web = [
+    "python-magic>=0.4.27",
+]
+
+[project.scripts]
+rename_media_files = "rename_media_files.controllers.cli:main_cli"
+
+[project.urls]
+bugs = "https://github.com/abalage/rename-media-files/issues"
+changelog = "https://github.com/abalage/rename-media-files/blob/master/changelog.md"
+homepage = "https://github.com/abalage/rename-media-files"
+
+[tool.setuptools]
+package-dir = {"" = "src"}
+
+[tool.setuptools_scm]
+
+[tool.setuptools.package-data]
+"*" = ["*.*"]
+
+# Mypy
+# ----
+
+[tool.mypy]
+files = "src"
+ignore_missing_imports = true
+
+# Use strict defaults
+strict = true
+warn_unreachable = true
+warn_no_return = true
+
+[tool.pytest.ini_options]
+pythonpath = [
+    ".", "src"
+]

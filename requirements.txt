@@ -1,0 +1,5 @@
+python-dateutil>=2.9.0
+python-ffmpeg>=2.0.12
+pillow>=11.3.0
+pillow-heif>=1.0.0
+pydantic>=2.7.0
