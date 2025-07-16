@@ -1,62 +1,44 @@
 import os
-import dateutil.parser
-import ffmpeg
+from rename_media_files.config.config import AppArgs, datetime_format
+from rename_media_files.utils.date_converter import DateConverter
+from rename_media_files.models.media_files_model import MediaFilesModel
+from rename_media_files.views.metadata_printer import MetadataPrinter
+from rename_media_files.models.rename_media_files import rename_files
 
-from time import strftime, strptime, localtime
-from pprint import pprint # for printing Python dictionaries in a human-readable way
-from PIL import Image
-from rename_media_files.config.config import AppArgs
 
 __all__ = ['main']
 
-def main(args: AppArgs) -> str:
-    datetime_format = '%Y%m%d_%H%M%S'
 
-    def convert_epoch_to_datetime(epoch):
-        # `epoch` is returned by lstat (int)
-        return strftime(datetime_format, localtime(epoch))
-
-    def convert_creation_time_to_datetime(ctime):
-        # `ctime` is returned by ffprobe (str)
-        parsed = dateutil.parser.parse(ctime)
-        rc = parsed.strftime(datetime_format)
-        return rc
-
-    def convert_creation_time_to_datetime_exif(ctime):
-        # `ctime` is returned by PIL.Image.getexif (str)
-        # 2006:09:09 20:36:30
-        parsed = strptime(ctime, "%Y:%m:%d %H:%M:%S")
-        return strftime(datetime_format, parsed)
-
-    def get_datetime_of_file(path):
-        lstat = os.lstat(path)
-        return convert_epoch_to_datetime(lstat.st_ctime)
-
-    def parse_metadata(path):
-        try:
-            # try videos first
-            ctime = ffmpeg.probe(path)["format"]["tags"]["creation_time"]
-            rc = convert_creation_time_to_datetime(ctime)
-        except KeyError:
-            if args['verbose']:
-                print(path + " => No such key is available. Falling back to image parsing.")
-            with Image.open(path) as im:
-                exif = im.getexif()
-                if args['verbose']:
-                    print(path + " => Exif data: " + str(exif.get(306)))
-                rc = convert_creation_time_to_datetime_exif(exif.get(306))
-        return rc
-
-    if args['input']:
-        # `input` is a list, elements are files
-        pprint(args['input'])
-        for item in args['input']:
-            if os.path.isfile(item):
-                dt = parse_metadata(item)
-                print(item + " => Parsed datetime: " + dt)
-            else:
-                print(item + " is not a file, you may need to use globs")
+def get_files_from_input(input_path: str) -> list[str]:
+    if os.path.isfile(input_path):
+        return [input_path]
+    elif os.path.isdir(input_path):
+        return [
+            os.path.join(input_path, f)
+            for f in os.listdir(input_path)
+            if os.path.isfile(os.path.join(input_path, f))
+        ]
     else:
-        print(args)
+        print(f"Input path '{input_path}' is not a valid file or directory.")
+        return []
 
-    return "Renaming completed successfully."
+
+def main(args: AppArgs) -> None:
+    input_path = args["input"]
+    if isinstance(input_path, list):
+        print("Error: input_path should be a string, not a list.")
+        return
+
+    files = get_files_from_input(input_path)
+    media_files_model = MediaFilesModel(files)
+    media_files_metadata = media_files_model.metadata
+
+    if media_files_metadata and args.get("verbose", False):
+        metadata_printer = MetadataPrinter(media_files_metadata)
+        metadata_printer.print_metadata_list()
+
+    # Invoke renaming after metadata is available
+    if media_files_metadata:
+        rename_files(media_files_metadata, args.get("target_dir"))
+
+    return None

@@ -1,5 +1,5 @@
+# core dependencies
 python-dateutil>=2.9.0
-python-ffmpeg>=2.0.12
-pillow>=11.3.0
-pillow-heif>=1.0.0
-pydantic>=2.7.0
+ExifRead>=3.3.1
+pymediainfo>=7.0.1
+pydantic>=2.10.0
