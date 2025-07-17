@@ -4,6 +4,15 @@ from rename_media_files.config.config import FileMetadata
 
 
 def rename_files(media_files_metadata: List[FileMetadata]) -> None:
+    """
+    Rename media files based on their creation date metadata.
+
+    Args:
+        media_files_metadata (List[FileMetadata]): List of FileMetadata objects containing file paths and metadata.
+
+    Returns:
+        None
+    """
     for metadata in media_files_metadata:
         dt_str: str = metadata.creation_date
         ext: str = os.path.splitext(metadata.file_path)[1]

@@ -7,11 +7,28 @@ from pymediainfo import MediaInfo
 
 
 class MediaFilesModel:
+    """Model for extracting and storing metadata from media files."""
+
     def __init__(self, files: list[str]):
+        """
+        Initialize the MediaFilesModel with a list of file paths.
+
+        Args:
+            files (list[str]): List of media file paths.
+        """
         self.files = files
         self.metadata_list = [self._create_metadata(file_path) for file_path in files]
 
     def _create_metadata(self, file_path: str) -> FileMetadata:
+        """
+        Create FileMetadata for a given file path.
+
+        Args:
+            file_path (str): Path to the media file.
+
+        Returns:
+            FileMetadata: Metadata object for the file.
+        """
         mime_type, _ = mimetypes.guess_type(file_path)
         file_type = self._get_file_type(mime_type)
         creation_date = self._get_creation_date(file_path, mime_type)
@@ -25,6 +42,15 @@ class MediaFilesModel:
         )
 
     def _get_file_type(self, mime_type: str | None) -> str:
+        """
+        Determine the file type from the MIME type.
+
+        Args:
+            mime_type (str | None): MIME type string.
+
+        Returns:
+            str: File type ('image', 'video', 'audio', or 'other').
+        """
         if mime_type is None:
             return "unknown"
         if mime_type.startswith("image"):
@@ -36,6 +62,15 @@ class MediaFilesModel:
         return "other"
 
     def _get_image_creation_date(self, file_path: str) -> str | None:
+        """
+        Extract the creation date from image EXIF metadata.
+
+        Args:
+            file_path (str): Path to the image file.
+
+        Returns:
+            str | None: Creation date string if available, else None.
+        """
         try:
             with open(file_path, "rb") as f:
                 tags = exif_process_file(f, details=False)
@@ -48,6 +83,15 @@ class MediaFilesModel:
         return None
 
     def _get_media_creation_date(self, file_path: str) -> str | None:
+        """
+        Extract the creation date from video/audio metadata.
+
+        Args:
+            file_path (str): Path to the media file.
+
+        Returns:
+            str | None: Creation date string if available, else None.
+        """
         try:
             media_info = MediaInfo.parse(file_path)
             for track in media_info.tracks:
@@ -65,6 +109,16 @@ class MediaFilesModel:
         return None
 
     def _get_creation_date(self, file_path: str, mime_type: str | None) -> str:
+        """
+        Get the creation date for a file, preferring metadata over file system timestamps.
+
+        Args:
+            file_path (str): Path to the media file.
+            mime_type (str | None): MIME type string.
+
+        Returns:
+            str: Creation date string.
+        """
         if mime_type:
             if mime_type.startswith("image"):
                 date = self._get_image_creation_date(file_path)
@@ -81,9 +135,24 @@ class MediaFilesModel:
         return datetime.fromtimestamp(ts).strftime(datetime_format)
 
     def _get_modification_date(self, file_path: str) -> str:
+        """
+        Get the modification date for a file from the file system.
+
+        Args:
+            file_path (str): Path to the media file.
+
+        Returns:
+            str: Modification date string.
+        """
         ts = os.path.getmtime(file_path)
         return datetime.fromtimestamp(ts).strftime(datetime_format)
 
     @property
     def metadata(self) -> list[FileMetadata]:
+        """
+        List of FileMetadata objects for all files.
+
+        Returns:
+            list[FileMetadata]: List of metadata objects.
+        """
         return self.metadata_list

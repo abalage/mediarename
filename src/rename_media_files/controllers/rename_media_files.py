@@ -10,6 +10,17 @@ __all__ = ['main']
 
 
 def get_files_from_input(input_path: str) -> list[str]:
+    """
+    Get a list of file paths from the input path.
+
+    Args:
+        input_path (str): Path to a file or directory.
+
+    Returns:
+        list[str]: List of file paths. If input is a file, returns a single-element list.
+                   If input is a directory, returns all files in the directory.
+                   Returns an empty list if input is invalid.
+    """
     if os.path.isfile(input_path):
         return [input_path]
     elif os.path.isdir(input_path):
@@ -24,6 +35,15 @@ def get_files_from_input(input_path: str) -> list[str]:
 
 
 def main(args: AppArgs) -> None:
+    """
+    Main entry point for processing and renaming media files.
+
+    Args:
+        args (AppArgs): Application arguments containing input path and options.
+
+    Returns:
+        None
+    """
     input: str = args["input"]
 
     files: List[str] = get_files_from_input(input)
