@@ -22,9 +22,8 @@ def parse_arguments() -> AppArgs:
 
 
 def main_cli() -> None:
-    args = parse_arguments()
-    df = process(args)
-    print(df)
+    args: AppArgs = parse_arguments()
+    process(args)
 
 
 if __name__ == "__main__":

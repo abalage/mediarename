@@ -1,9 +1,9 @@
 import os
-from rename_media_files.config.config import AppArgs, datetime_format
-from rename_media_files.utils.date_converter import DateConverter
+from typing import List
+from rename_media_files.config.config import AppArgs, FileMetadata
 from rename_media_files.models.media_files_model import MediaFilesModel
 from rename_media_files.views.metadata_printer import MetadataPrinter
-from rename_media_files.models.rename_media_files import rename_files
+from rename_media_files.models.rename_files import rename_files
 
 
 __all__ = ['main']
@@ -24,21 +24,18 @@ def get_files_from_input(input_path: str) -> list[str]:
 
 
 def main(args: AppArgs) -> None:
-    input_path = args["input"]
-    if isinstance(input_path, list):
-        print("Error: input_path should be a string, not a list.")
-        return
+    input: str = args["input"]
 
-    files = get_files_from_input(input_path)
-    media_files_model = MediaFilesModel(files)
-    media_files_metadata = media_files_model.metadata
+    files: List[str] = get_files_from_input(input)
+    media_files_model: MediaFilesModel = MediaFilesModel(files)
+    media_files_metadata: List[FileMetadata] = media_files_model.metadata
 
     if media_files_metadata and args.get("verbose", False):
-        metadata_printer = MetadataPrinter(media_files_metadata)
+        metadata_printer: MetadataPrinter = MetadataPrinter(media_files_metadata)
         metadata_printer.print_metadata_list()
 
     # Invoke renaming after metadata is available
     if media_files_metadata:
-        rename_files(media_files_metadata, args.get("target_dir"))
+        rename_files(media_files_metadata)
 
     return None

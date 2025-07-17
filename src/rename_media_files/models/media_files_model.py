@@ -2,10 +2,9 @@ import os
 import mimetypes
 from datetime import datetime
 from rename_media_files.config.config import FileMetadata, datetime_format
-
-# Add imports for EXIF and pymediainfo
 from exifread import process_file as exif_process_file
 from pymediainfo import MediaInfo
+
 
 class MediaFilesModel:
     def __init__(self, files: list[str]):
@@ -36,37 +35,45 @@ class MediaFilesModel:
             return "audio"
         return "other"
 
-    def _get_creation_date(self, file_path: str, mime_type: str | None) -> str:
-        # For images, try EXIF
-        if mime_type and mime_type.startswith("image"):
-            try:
-                with open(file_path, "rb") as f:
-                    tags = exif_process_file(f, details=False)
-                date_tag = tags.get("EXIF DateTimeOriginal") or tags.get("Image DateTime")
-                if date_tag:
-                    # EXIF date format: "YYYY:MM:DD HH:MM:SS"
-                    dt = datetime.strptime(str(date_tag), "%Y:%m:%d %H:%M:%S")
-                    return dt.strftime(datetime_format)
-            except Exception as e:
-                print(f"EXIF read error for {file_path}: {e}")  # Print error before fallback
+    def _get_image_creation_date(self, file_path: str) -> str | None:
+        try:
+            with open(file_path, "rb") as f:
+                tags = exif_process_file(f, details=False)
+            date_tag = tags.get("EXIF DateTimeOriginal") or tags.get("Image DateTime")
+            if date_tag:
+                dt = datetime.strptime(str(date_tag), "%Y:%m:%d %H:%M:%S")
+                return dt.strftime(datetime_format)
+        except Exception as e:
+            print(f"EXIF read error for {file_path}: {e}")
+        return None
 
-        # For audio/video, try pymediainfo
-        if mime_type and (mime_type.startswith("video") or mime_type.startswith("audio")):
-            try:
-                media_info = MediaInfo.parse(file_path)
-                for track in media_info.tracks:
-                    for attr in ["encoded_date", "tagged_date"]:
-                        dt_str = getattr(track, attr, None)
-                        if dt_str:
-                            # Remove 'UTC' from anywhere and strip whitespace
-                            dt_str = dt_str.replace("UTC", "").strip()
-                            try:
-                                dt = datetime.strptime(dt_str, "%Y-%m-%d %H:%M:%S")
-                                return dt.strftime(datetime_format)
-                            except Exception as e:
-                                print(f"Date parse error for {file_path} ({attr}): {e}")
-            except Exception as e:
-                print(f"MediaInfo read error for {file_path}: {e}")  # Print error before fallback
+    def _get_media_creation_date(self, file_path: str) -> str | None:
+        try:
+            media_info = MediaInfo.parse(file_path)
+            for track in media_info.tracks:
+                for attr in ["encoded_date", "tagged_date"]:
+                    dt_str = getattr(track, attr, None)
+                    if dt_str:
+                        dt_str = dt_str.replace("UTC", "").strip()
+                        try:
+                            dt = datetime.strptime(dt_str, "%Y-%m-%d %H:%M:%S")
+                            return dt.strftime(datetime_format)
+                        except Exception as e:
+                            print(f"Date parse error for {file_path} ({attr}): {e}")
+        except Exception as e:
+            print(f"MediaInfo read error for {file_path}: {e}")
+        return None
+
+    def _get_creation_date(self, file_path: str, mime_type: str | None) -> str:
+        if mime_type:
+            if mime_type.startswith("image"):
+                date = self._get_image_creation_date(file_path)
+                if date:
+                    return date
+            elif mime_type.startswith("video") or mime_type.startswith("audio"):
+                date = self._get_media_creation_date(file_path)
+                if date:
+                    return date
 
         # Fallback: file system creation time
         print(f"Using file system creation time for {file_path}")
