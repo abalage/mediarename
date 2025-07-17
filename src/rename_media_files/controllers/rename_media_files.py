@@ -45,9 +45,10 @@ def main(args: AppArgs) -> None:
         None
     """
     input: str = args["input"]
+    datetime_format: str = args["datetime_format"]
 
     files: List[str] = get_files_from_input(input)
-    media_files_model: MediaFilesModel = MediaFilesModel(files)
+    media_files_model: MediaFilesModel = MediaFilesModel(files, datetime_format)
     media_files_metadata: List[FileMetadata] = media_files_model.metadata
 
     if media_files_metadata and args.get("verbose", False):

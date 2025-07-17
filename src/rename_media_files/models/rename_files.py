@@ -24,7 +24,6 @@ def rename_files(media_files_metadata: List[FileMetadata]) -> None:
 
         # Skip if already renamed
         if os.path.basename(src) == new_name:
-            print(f"Already renamed: {src}")
             continue
 
         try:

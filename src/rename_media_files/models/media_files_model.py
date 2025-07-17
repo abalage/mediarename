@@ -1,7 +1,7 @@
 import os
 import mimetypes
 from datetime import datetime
-from rename_media_files.config.config import FileMetadata, datetime_format
+from rename_media_files.config.config import FileMetadata
 from exifread import process_file as exif_process_file
 from pymediainfo import MediaInfo
 
@@ -9,14 +9,21 @@ from pymediainfo import MediaInfo
 class MediaFilesModel:
     """Model for extracting and storing metadata from media files."""
 
-    def __init__(self, files: list[str]):
+    def __init__(self, files: list[str], datetime_format: str) -> None:
         """
         Initialize the MediaFilesModel with a list of file paths.
 
         Args:
             files (list[str]): List of media file paths.
+            datetime_format (str): Format for datetime strings in filenames.
         """
+        forbidden_chars = set(r'\/:*?"<>|;')
+        if any(c in datetime_format for c in forbidden_chars):
+            raise ValueError(
+                f"datetime_format contains forbidden characters: {forbidden_chars & set(datetime_format)}"
+            )
         self.files = files
+        self.datetime_format = datetime_format
         self.metadata_list = [self._create_metadata(file_path) for file_path in files]
 
     def _create_metadata(self, file_path: str) -> FileMetadata:
@@ -73,11 +80,11 @@ class MediaFilesModel:
         """
         try:
             with open(file_path, "rb") as f:
-                tags = exif_process_file(f, details=False)
+                tags = exif_process_file(f, details=False, extract_thumbnail=False)
             date_tag = tags.get("EXIF DateTimeOriginal") or tags.get("Image DateTime")
             if date_tag:
                 dt = datetime.strptime(str(date_tag), "%Y:%m:%d %H:%M:%S")
-                return dt.strftime(datetime_format)
+                return dt.strftime(self.datetime_format)
         except Exception as e:
             print(f"EXIF read error for {file_path}: {e}")
         return None
@@ -101,7 +108,7 @@ class MediaFilesModel:
                         dt_str = dt_str.replace("UTC", "").strip()
                         try:
                             dt = datetime.strptime(dt_str, "%Y-%m-%d %H:%M:%S")
-                            return dt.strftime(datetime_format)
+                            return dt.strftime(self.datetime_format)
                         except Exception as e:
                             print(f"Date parse error for {file_path} ({attr}): {e}")
         except Exception as e:
@@ -129,10 +136,9 @@ class MediaFilesModel:
                 if date:
                     return date
 
-        # Fallback: file system creation time
-        print(f"Using file system creation time for {file_path}")
-        ts = os.path.getctime(file_path)
-        return datetime.fromtimestamp(ts).strftime(datetime_format)
+        # Fallback: file system modification time
+        print(f"Using file system modification time for {file_path}")
+        return self._get_modification_date(file_path)
 
     def _get_modification_date(self, file_path: str) -> str:
         """
@@ -145,7 +151,7 @@ class MediaFilesModel:
             str: Modification date string.
         """
         ts = os.path.getmtime(file_path)
-        return datetime.fromtimestamp(ts).strftime(datetime_format)
+        return datetime.fromtimestamp(ts).strftime(self.datetime_format)
 
     @property
     def metadata(self) -> list[FileMetadata]:

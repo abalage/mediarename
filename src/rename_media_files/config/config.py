@@ -12,6 +12,7 @@ class AppArgs(TypedDict):
     """
     verbose: bool
     input: str
+    datetime_format: str
 
 
 class FileMetadata(BaseModel):
@@ -30,6 +31,3 @@ class FileMetadata(BaseModel):
     modification_date: str = Field(..., description="Modification date in the format YYYY-MM-DD")
     file_type: str = Field(..., description="Type of the file (e.g., image, video, audio)")
     mime_type: str = Field(..., description="File format (e.g., jpg, mp4, mp3)")
-
-
-datetime_format = '%Y%m%d_%H%M%S'  # Format for datetime strings used
