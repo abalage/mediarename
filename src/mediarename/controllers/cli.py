@@ -1,4 +1,4 @@
-"""Console script for rename-media-files."""
+"""Console script for mediarename."""
 import argparse
 from mediarename.controllers.mediarename import main as process
 from mediarename.config.config import AppArgs
