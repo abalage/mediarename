@@ -13,6 +13,7 @@ class AppArgs(TypedDict):
     verbose: bool
     input: str
     datetime_format: str
+    dry_run: bool
 
 
 class FileMetadata(BaseModel):

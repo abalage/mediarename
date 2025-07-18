@@ -7,15 +7,6 @@ class DummyModel:
         self.metadata = [f"meta-{f}" for f in files]
 
 
-class DummyPrinter:
-    def __init__(self, metadata):
-        self.metadata = metadata
-        self.printed = False
-
-    def print_metadata_list(self):
-        self.printed = True
-
-
 class DummyRenameFiles:
     def __init__(self):
         self.called = False
@@ -34,6 +25,7 @@ def make_args(temp_media_files, verbose=True):
     return AppArgs(
         input=dir_path,
         datetime_format="%Y-%m-%d",
+        dry_run=False,
         verbose=verbose
     )
 
@@ -43,8 +35,13 @@ def test_main_invokes_metadata_and_rename(monkeypatch, temp_media_files):
     monkeypatch.setattr(
         "rename_media_files.controllers.rename_media_files.MediaFilesModel", DummyModel
     )
+    dummy_print_metadata_list_called = {"called": False}
+
+    def dummy_print_metadata_list(metadata):
+        dummy_print_metadata_list_called["called"] = True
+
     monkeypatch.setattr(
-        "rename_media_files.controllers.rename_media_files.MetadataPrinter", DummyPrinter
+        "rename_media_files.controllers.rename_media_files.print_metadata_list", dummy_print_metadata_list
     )
     monkeypatch.setattr(
         "rename_media_files.controllers.rename_media_files.rename_files", dummy_rename_files
@@ -53,7 +50,7 @@ def test_main_invokes_metadata_and_rename(monkeypatch, temp_media_files):
 
     main(args)
     assert dummy_rename_files.called
-    assert isinstance(DummyPrinter(args["input"]), DummyPrinter)
+    assert dummy_print_metadata_list_called["called"]
 
 
 def test_main_with_no_files(monkeypatch, temp_media_files):
@@ -65,7 +62,7 @@ def test_main_with_no_files(monkeypatch, temp_media_files):
         "rename_media_files.controllers.rename_media_files.MediaFilesModel", DummyModel
     )
     monkeypatch.setattr(
-        "rename_media_files.controllers.rename_media_files.MetadataPrinter", DummyPrinter
+        "rename_media_files.controllers.rename_media_files.print_metadata_list", lambda x: None
     )
     monkeypatch.setattr(
         "rename_media_files.controllers.rename_media_files.rename_files", dummy_rename_files
@@ -82,7 +79,7 @@ def test_main_non_verbose(monkeypatch, temp_media_files):
         "rename_media_files.controllers.rename_media_files.MediaFilesModel", DummyModel
     )
     monkeypatch.setattr(
-        "rename_media_files.controllers.rename_media_files.MetadataPrinter", DummyPrinter
+        "rename_media_files.controllers.rename_media_files.print_metadata_list", lambda x: None
     )
     monkeypatch.setattr(
         "rename_media_files.controllers.rename_media_files.rename_files", dummy_rename_files

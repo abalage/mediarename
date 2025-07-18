@@ -2,8 +2,8 @@ import os
 from typing import List
 from rename_media_files.config.config import AppArgs, FileMetadata
 from rename_media_files.models.media_files_model import MediaFilesModel
-from rename_media_files.views.metadata_printer import MetadataPrinter
-from rename_media_files.models.rename_files import rename_files
+from rename_media_files.views.metadata_printer import print_metadata_list
+from rename_media_files.models.rename_files import rename_files, pretend_rename_files
 
 
 __all__ = ['main']
@@ -52,11 +52,15 @@ def main(args: AppArgs) -> None:
     media_files_metadata: List[FileMetadata] = media_files_model.metadata
 
     if media_files_metadata and args.get("verbose", False):
-        metadata_printer: MetadataPrinter = MetadataPrinter(media_files_metadata)
-        metadata_printer.print_metadata_list()
+        print_metadata_list(media_files_metadata)
 
     # Invoke renaming after metadata is available
     if media_files_metadata:
-        rename_files(media_files_metadata)
+        if args.get("dry_run", False):
+            print("Dry run mode: No files will be renamed.")
+            pretend_rename_files(media_files_metadata)
+        else:
+            print("Renaming files...")
+            rename_files(media_files_metadata)
 
     return None
