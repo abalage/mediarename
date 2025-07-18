@@ -12,6 +12,8 @@ A package to mass rename media files based on their metadata.
 
 You need Python 3.11 or newer.
 
+TODO: not released yet on pypi, use manual installation.
+
 ```sh
 pip install mediarename
 ```
