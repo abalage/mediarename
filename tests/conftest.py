@@ -1,5 +1,5 @@
 import pytest
-from rename_media_files.config.config import FileMetadata
+from mediarename.config.config import FileMetadata
 
 
 @pytest.fixture

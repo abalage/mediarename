@@ -1,7 +1,7 @@
 """Console script for rename-media-files."""
 import argparse
-from rename_media_files.controllers.rename_media_files import main as process
-from rename_media_files.config.config import AppArgs
+from mediarename.controllers.mediarename import main as process
+from mediarename.config.config import AppArgs
 
 
 def parse_arguments() -> AppArgs:

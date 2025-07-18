@@ -1,8 +1,8 @@
 import pytest
 import os
 from datetime import datetime
-from rename_media_files.models.media_files_model import MediaFilesModel
-from rename_media_files.config.config import FileMetadata
+from mediarename.models.media_files_model import MediaFilesModel
+from mediarename.config.config import FileMetadata
 
 
 def test_media_files_model_with_directory(temp_media_files):

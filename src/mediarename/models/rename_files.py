@@ -1,6 +1,6 @@
 import os
 from typing import List
-from rename_media_files.config.config import FileMetadata
+from mediarename.config.config import FileMetadata
 
 
 def rename_files(media_files_metadata: List[FileMetadata]) -> None:

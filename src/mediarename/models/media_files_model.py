@@ -1,7 +1,7 @@
 import os
 import mimetypes
 from datetime import datetime
-from rename_media_files.config.config import FileMetadata
+from mediarename.config.config import FileMetadata
 from exifread import process_file as exif_process_file
 from pymediainfo import MediaInfo
 

@@ -1,4 +1,4 @@
-from rename_media_files.views.metadata_printer import print_file_paths, print_metadata_list
+from mediarename.views.metadata_printer import print_file_paths, print_metadata_list
 
 
 def test_print_file_paths_image(capsys, image_metadata_list):

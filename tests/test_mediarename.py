@@ -1,5 +1,5 @@
-from rename_media_files.controllers.rename_media_files import main
-from rename_media_files.controllers.rename_media_files import AppArgs
+from mediarename.controllers.mediarename import main
+from mediarename.controllers.mediarename import AppArgs
 
 
 class DummyModel:
@@ -33,7 +33,7 @@ def make_args(temp_media_files, verbose=True):
 def test_main_invokes_metadata_and_rename(monkeypatch, temp_media_files):
     args = make_args(temp_media_files)
     monkeypatch.setattr(
-        "rename_media_files.controllers.rename_media_files.MediaFilesModel", DummyModel
+        "mediarename.controllers.mediarename.MediaFilesModel", DummyModel
     )
     dummy_print_metadata_list_called = {"called": False}
 
@@ -41,10 +41,10 @@ def test_main_invokes_metadata_and_rename(monkeypatch, temp_media_files):
         dummy_print_metadata_list_called["called"] = True
 
     monkeypatch.setattr(
-        "rename_media_files.controllers.rename_media_files.print_metadata_list", dummy_print_metadata_list
+        "mediarename.controllers.mediarename.print_metadata_list", dummy_print_metadata_list
     )
     monkeypatch.setattr(
-        "rename_media_files.controllers.rename_media_files.rename_files", dummy_rename_files
+        "mediarename.controllers.mediarename.rename_files", dummy_rename_files
     )
     dummy_rename_files.called = False
 
@@ -56,16 +56,16 @@ def test_main_invokes_metadata_and_rename(monkeypatch, temp_media_files):
 def test_main_with_no_files(monkeypatch, temp_media_files):
     args = make_args(temp_media_files)
     monkeypatch.setattr(
-        "rename_media_files.controllers.rename_media_files.get_files_from_input", lambda x: []
+        "mediarename.controllers.mediarename.get_files_from_input", lambda x: []
     )
     monkeypatch.setattr(
-        "rename_media_files.controllers.rename_media_files.MediaFilesModel", DummyModel
+        "mediarename.controllers.mediarename.MediaFilesModel", DummyModel
     )
     monkeypatch.setattr(
-        "rename_media_files.controllers.rename_media_files.print_metadata_list", lambda x: None
+        "mediarename.controllers.mediarename.print_metadata_list", lambda x: None
     )
     monkeypatch.setattr(
-        "rename_media_files.controllers.rename_media_files.rename_files", dummy_rename_files
+        "mediarename.controllers.mediarename.rename_files", dummy_rename_files
     )
     dummy_rename_files.called = False
 
@@ -76,13 +76,13 @@ def test_main_with_no_files(monkeypatch, temp_media_files):
 def test_main_non_verbose(monkeypatch, temp_media_files):
     args = make_args(temp_media_files, verbose=False)
     monkeypatch.setattr(
-        "rename_media_files.controllers.rename_media_files.MediaFilesModel", DummyModel
+        "mediarename.controllers.mediarename.MediaFilesModel", DummyModel
     )
     monkeypatch.setattr(
-        "rename_media_files.controllers.rename_media_files.print_metadata_list", lambda x: None
+        "mediarename.controllers.mediarename.print_metadata_list", lambda x: None
     )
     monkeypatch.setattr(
-        "rename_media_files.controllers.rename_media_files.rename_files", dummy_rename_files
+        "mediarename.controllers.mediarename.rename_files", dummy_rename_files
     )
     dummy_rename_files.called = False
 

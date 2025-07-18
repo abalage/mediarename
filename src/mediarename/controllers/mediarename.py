@@ -1,9 +1,9 @@
 import os
 from typing import List
-from rename_media_files.config.config import AppArgs, FileMetadata
-from rename_media_files.models.media_files_model import MediaFilesModel
-from rename_media_files.views.metadata_printer import print_metadata_list
-from rename_media_files.models.rename_files import rename_files, pretend_rename_files
+from mediarename.config.config import AppArgs, FileMetadata
+from mediarename.models.media_files_model import MediaFilesModel
+from mediarename.views.metadata_printer import print_metadata_list
+from mediarename.models.rename_files import rename_files, pretend_rename_files
 
 
 __all__ = ['main']

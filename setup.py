@@ -11,7 +11,7 @@ setup(
     description='A package to mass rename media files based on their metadata.',
     long_description=open('README.md').read(),
     long_description_content_type='text/markdown',
-    name='rename-media-files',
+    name='mediarename',
     python_requires='>=3.11',
-    url='https://github.com/abalage/rename-media-files',
+    url='https://github.com/abalage/mediarename',
 )

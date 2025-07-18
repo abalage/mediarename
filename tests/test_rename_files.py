@@ -1,5 +1,5 @@
 import os
-from rename_media_files.models.rename_files import rename_files
+from mediarename.models.rename_files import rename_files
 
 
 def test_rename_files_with_image_metadata(tmp_path, image_metadata_list):

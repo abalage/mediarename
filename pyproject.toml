@@ -3,7 +3,7 @@ requires = ["setuptools>=61.0", "setuptools-scm>=8"]
 build-backend = "setuptools.build_meta"
 
 [project]
-name = "rename-media-files"
+name = "mediarename"
 dynamic = ["version"]
 description = "A package to mass rename media files based on their metadata."
 keywords = ["rename", "image", "video"]
@@ -42,12 +42,12 @@ web = [
 ]
 
 [project.scripts]
-rename_media_files = "rename_media_files.controllers.cli:main_cli"
+mediarename = "mediarename.controllers.cli:main_cli"
 
 [project.urls]
-bugs = "https://github.com/abalage/rename-media-files/issues"
-changelog = "https://github.com/abalage/rename-media-files/blob/master/changelog.md"
-homepage = "https://github.com/abalage/rename-media-files"
+bugs = "https://github.com/abalage/mediarename/issues"
+changelog = "https://github.com/abalage/mediarename/blob/master/changelog.md"
+homepage = "https://github.com/abalage/mediarename"
 
 [tool.setuptools]
 package-dir = {"" = "src"}
